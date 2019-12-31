@@ -1,0 +1,35 @@
+<%- include('../layouts/head.ejs') %>
+<link rel="stylesheet" href="/style/product.css">
+<%- include('../layouts/nav.ejs') %>
+<main>
+    <% if(blogs.length > 0) { %>
+        <% for (blog of blogs) { %>
+            <a href="/admin/edit-blog/<%= blog._id %>?edit=true" style="text-decoration: none; color:black;">
+                <div class="grid">
+                    <article class="card_product_item">
+                        <header class="card_header">
+                            <h1 class="product_title"> <%= blog.title %> </h1>
+                        </header>
+                        <br>
+                        <div class="card_product_image">
+                            <img src="<%= blog.image_URL %>" alt="Product Image">
+                        </div>
+                        <div class="card_product_content">
+                            <p class="product_description"> <%= blog.description %> </p>
+                        </div>
+            </a>            
+                        <div class="card_actions">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken%>">
+                                <input type='hidden' value="<%= blog._id %>" name="blogID">
+                                <button class="btn" type="button" onclick="deleteBlog(this)"> Delete </button>
+                        </div>
+                    </article>
+                </div>
+        <% } %>
+            <%- include('../layouts/pagination.ejs', {hasNextPage: hasNextPage, hasPreviousPage: hasPreviousPage, currentPage: currentPage, nextPage: nextPage, previousPage: previousPage, lastPage: lastPage}) %>
+    <% } else { %>
+    <h1> No Blogs yet by you! <h1>
+            <% } %>
+</main>
+<%- include('../layouts/foot.ejs') %>
+<script type="text/javascript" src='/js/admin.js'> </script>

@@ -1,0 +1,47 @@
+<%- include('../layouts/head.ejs') %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+  .fa {
+    font-size: 50px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .fa:hover {
+    color: darkblue;
+  }
+</style>
+
+<link rel="stylesheet" href="/style/product.css">
+<%- include('../layouts/nav.ejs') %>
+<main class="centered">
+   <form class="product-form" action="/admin/post-comment" method="POST" enctype="multipart/form-data">
+      <h1> <%= blog.title %> </h1>
+      <hr>
+      <div class="card_product_image">
+        <img src="<%= blog.image_URL %>" alt="Product Image">
+      </div>
+          <p> <%= blog.description %> </p>
+          <p style="text-align: right; font-weight: bold;"> Blog by:- <%= author%> </p>
+            <i id="likeID" class=" <%= like=='true' ? 'fa fa-thumbs-down' : 'fa fa-thumbs-up' %> " onclick="likeFunction(this, <%= like%>)"> </i>
+            (<label id="likeLabel" class="like" ><%= blog.likes.totalQty%></label>)
+            <% if(isAuthenticated) { %>
+              <textarea class="comments" type="text" name="comment" id="biography" rows="2" cols="80"> </textarea>
+               <input type="hidden" name="_csrf" value="<%= csrfToken%>">
+               <input type="hidden" name = "blogID" value = "<%= blog._id %>">
+               <button class="add-button" type="submit"> Comment </button>
+               </input>
+          <% } %>
+          <h2> Comment Section </h2>
+          <hr>
+       <% if (comments.length>0) { %>
+          <% for (comment of comments) { %>
+                <p> <%= comment.commented_by.email %> - <%= comment.comments %> | <%= comment.updated_at%> </p>
+                <hr>
+          <% } %>
+       <% } %>   
+   </form>
+</main>
+
+<%- include('../layouts/foot.ejs') %>
+<script type="text/javascript" src='/js/admin.js'> </script>
