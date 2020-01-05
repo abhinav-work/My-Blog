@@ -2,14 +2,14 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const { validationResult } = require('express-validator/check')
-const nodemailer = require('nodemailer');
-const sendGridTransport = require('nodemailer-sendgrid-transport');
+// const nodemailer = require('nodemailer');
+// const sendGridTransport = require('nodemailer-sendgrid-transport');
 
-const transporter = nodemailer.createTransport(sendGridTransport({
-    auth: {
-        api_key: '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'
-    }
-}));
+// const transporter = nodemailer.createTransport(sendGridTransport({
+//     auth: {
+//         api_key: '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'
+//     }
+// }));
 
 
 exports.getLogin = (req, res, next) => {
@@ -153,11 +153,6 @@ exports.postSignUp = (req, res, next) => {
                         })
                         .then(result => {
                                             res.redirect('/login');
-                                            return transporter.sendMail({
-                                                to: email, 
-                                                from: 'shop@ecommerce.com',
-                                                subject: "SignUp Successfull!",
-                                                html: '<h1> You have successfully Signed Up </h1>'
                                             })
                                             .then(result => {
                                                 console.log("Mail Sent")
@@ -170,136 +165,3 @@ exports.postSignUp = (req, res, next) => {
                             return next(error)
                         });
 }
-exports.getReset = (req, res, next) => {
-    if (req.session.isLoggedIn) {
-        return res.redirect('/')
-    }
-    let message = req.flash('error');
-    if (message.length > 0) {
-        message = message[0];
-    }
-    else {
-        message = null;
-    }
-    res.render('auth/reset', {
-        pageTitle: "Reset Password",
-        errorMessage: message
-    });
-}
-
-// exports.postReset = (req, res, next) => {
-//     email = req.body.email;
-
-//     crypto.randomBytes(32, (err, buffer) => {
-//                 if (err) {
-//                     console.log(err);
-//                     return res.redirect('/')
-//                 }
-//                 const token = buffer.toString('hex');
-//                  User.findOne({
-//                          email: email
-//                      })
-//                      .then(user => {
-//                          if (!user) {
-//                              req.flash('error', "Email doesn't exist with our database");
-//                              return res.redirect('/reset');
-//                          }
-//                          console.log('User Found! ' + token)
-//                          user.lastToken = token;
-//                          user.lastTokenExpiration = Date.now() + 3600000;
-                        
-//                          return user.save();
-//                      })
-//                      .then(result => {
-//                          res.redirect('/');
-//                          return transporter.sendMail({
-//                              to: email,
-//                              from: 'shop@ecommerce.com',
-//                              subject: "Password Reset",
-//                              html: `
-//                                     <p> As per your request for the password reset </p>
-//                                     <p> Here is your link, <a href="http://www.localhost:5000/reset/${token}"> Click Here </a> </p> 
-//                                 `
-//                          }).then(result => {
-//                              console.log("Mail Sent")
-//                          })
-//                      })
-//                      .catch(err => {
-//                          console.log(err)
-//                          const error = new Error(err);
-//                          error.httpStatusCode = 500;
-//                          return next(error)
-//                      });
-//         })
-//     }
-
-//     exports.getResetPassword = (req, res, next) => {
-//         const token = req.params.token;
-//         User.findOne({lastToken: token, lastTokenExpiration: {$gt: Date.now()}})
-//                 .then(user => {
-//                          if (req.session.isLoggedIn || !user) {
-//                              return res.redirect('/')
-//                          }
-//                          let message = req.flash('error');
-//                          if (message.length > 0) {
-//                              message = message[0];
-//                          } else {
-//                              message = null;
-//                          }
-//                          console.log(user)
-//                          res.render('auth/new-password', {
-//                              pageTitle: "Reset Password",
-//                              errorMessage: message,
-//                              userID: user._id.toString()
-//                          });
-//                 })
-//                .catch(err => {
-//                    console.log(err)
-//                    const error = new Error(err);
-//                    error.httpStatusCode = 500;
-//                    return next(error)
-//                });
-//     }
-
-//     exports.postResetPassword = (req, res, next) => {
-//         const password = req.body.password1;
-//         const confirmpassword = req.body.password2;
-//         console.log(req.body.userID)
-//         if(password.toString()===confirmpassword.toString())
-//         {
-//             User.findById(req.body._id)
-//                 .then(user => {
-//                                     return bcrypt.hash(password, 12)
-//                                                     .then(hashedPassword => {
-//                                                                                     user.password = hashedPassword;
-//                                                                                     user.lastToken = undefined;
-//                                                                                     user.lastTokenExpiration = undefined;
-//                                                                                     return user.save();
-                                                                                    
-//                                                     })
-//                                                     .then(result => {
-//                                                         res.redirect('/login');
-//                                                         return transporter.sendMail({
-//                                                             to: user.email,
-//                                                             from: 'shop@ecommerce.com',
-//                                                             subject: "Password Reset Successfull!",
-//                                                             html: '<h1> You have successfully reset your password </h1>'
-//                                                         })
-//                                                         .then(result => {
-//                                                             console.log("Mail Sent")
-//                                                         })
-//                                                     })      
-//                                                     .catch(err => {
-//                                                         console.log(err)
-//                                                         const error = new Error(err);
-//                                                         error.httpStatusCode = 500;
-//                                                         return next(error)
-//                                                     });
-//                 })
-//                 .catch(err => console.log(err))
-//         }else{
-//             console.log("Donot match")
-//             req.flash('error', "Passwords don't match!")
-//             res.redirect(req.get('referer'));
-//         }
-//     }
